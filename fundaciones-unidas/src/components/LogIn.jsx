@@ -1,5 +1,6 @@
-import "./Login.css"
+import "./Login.css";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { loginUser } from "../services/api";
 import Swal from "sweetalert2";
 
@@ -7,32 +8,28 @@ const LogIn = ({ isAdmin = false }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // React Router navigation
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Datos enviados:", { email, password });
         setError(null);
 
         const response = await loginUser(email, password);
-        console.log("Respuesta del backend:", response);
 
         if (response.error) {
-            //setError(response.error);
             Swal.fire({
                 title: "Failed Login!",
                 icon: "error",
                 draggable: true
             });
         } else {
-            localStorage.setItem("token", response.access_token); // Cambia "token" por "access_token"
+            localStorage.setItem("token", response.access_token);
             localStorage.setItem("rol", response.rol);
-            //alert("Inicio de sesión exitoso");
             Swal.fire({
                 title: `Inicio de sesión exitoso como ${response.rol}`,
                 icon: "success",
                 draggable: true
             });
-            
         }
     };
 
@@ -63,6 +60,8 @@ const LogIn = ({ isAdmin = false }) => {
                     <button type="submit">Iniciar sesión</button>
                 </form>
 
+                {/* Navigate to signup page */}
+                <p>¿No tienes una cuenta? <button onClick={() => navigate("/signup")}>Regístrate aquí</button></p>
             </div>
             <div className="login-side">
                 <h3>
