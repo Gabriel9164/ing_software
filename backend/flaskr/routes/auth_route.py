@@ -96,33 +96,67 @@ def recover_password():
         return jsonify({"error": "Failed to send reset email"}), 500
 
 
-@auth_bp.route('/reset-password/<token>', methods=['POST'])
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 @cross_origin(origins="http://localhost:5173", supports_credentials=True)
 def reset_password(token):
-    data = request.get_json()
-    new_password = data.get('password')
+    if request.method == 'GET':
+        return '''
+            <form method="POST">
+                <label>New Password:</label>
+                <input type="password" name="password" required>
+                <input type="submit" value="Reset Password">
+            </form>
+        '''
 
-    if not new_password or len(new_password) < 8:
-        return jsonify({"error": "Password must be at least 8 characters"}), 400
+    elif request.method == 'POST':
+        new_password = request.form.get('password')
 
-    try:
-        s = URLSafeTimedSerializer(Config.SECRET_KEY)
-        email = s.loads(token, salt='password-reset-salt', max_age=3600)
-    except Exception:
-        return jsonify({"error": "Invalid or expired reset link"}), 400
+        if not new_password or len(new_password) < 8:
+            return '''
+                <script>
+                    alert("Password must be at least 8 characters");
+                    window.history.back();
+                </script>
+            '''
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+        try:
+            s = URLSafeTimedSerializer(Config.SECRET_KEY)
+            email = s.loads(token, salt='password-reset-salt', max_age=3600)
+        except Exception:
+            return '''
+                <script>
+                    alert("Invalid or expired reset link");
+                    window.location.href = "http://localhost:5173/login";
+                </script>
+            '''
 
-    try:
-        user.password = generate_password_hash(new_password)
-        db.session.commit()
-        return jsonify({"message": "Password reset successful"}), 200
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Database error: {str(e)}")
-        return jsonify({"error": "Failed to reset password"}), 500
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return '''
+                <script>
+                    alert("User not found");
+                    window.location.href = "http://localhost:5173/login";
+                </script>
+            '''
+
+        try:
+            user.password = generate_password_hash(new_password)
+            db.session.commit()
+            return '''
+                <script>
+                    alert("Password reset successful! Redirecting to login...");
+                    window.location.href = "http://localhost:5173/login";
+                </script>
+            '''
+        except Exception as e:
+            db.session.rollback()
+            return '''
+                <script>
+                    alert("Failed to reset password. Please try again.");
+                    window.history.back();
+                </script>
+            '''
+
 
 
 
