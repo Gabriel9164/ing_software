@@ -96,66 +96,42 @@ def recover_password():
         return jsonify({"error": "Failed to send reset email"}), 500
 
 
+
+from flask import jsonify, redirect
+
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 @cross_origin(origins="http://localhost:5173", supports_credentials=True)
 def reset_password(token):
     if request.method == 'GET':
-        return '''
-            <form method="POST">
-                <label>New Password:</label>
-                <input type="password" name="password" required>
-                <input type="submit" value="Reset Password">
-            </form>
-        '''
+        # Redirect user to the React frontend for password reset
+        return redirect(f"http://localhost:5173/reset-password/{token}")
 
-    elif request.method == 'POST':
-        new_password = request.form.get('password')
+    # Handle POST request for actual password reset
+    data = request.get_json()
+    new_password = data.get('password')
 
-        if not new_password or len(new_password) < 8:
-            return '''
-                <script>
-                    alert("Password must be at least 8 characters");
-                    window.history.back();
-                </script>
-            '''
+    if not new_password or len(new_password) < 8:
+        return jsonify({"message": "Password must be at least 8 characters", "success": False}), 400
 
-        try:
-            s = URLSafeTimedSerializer(Config.SECRET_KEY)
-            email = s.loads(token, salt='password-reset-salt', max_age=3600)
-        except Exception:
-            return '''
-                <script>
-                    alert("Invalid or expired reset link");
-                    window.location.href = "http://localhost:5173/login";
-                </script>
-            '''
+    try:
+        s = URLSafeTimedSerializer(Config.SECRET_KEY)
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
+    except Exception:
+        return jsonify({"message": "Invalid or expired reset link", "success": False}), 400
 
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            return '''
-                <script>
-                    alert("User not found");
-                    window.location.href = "http://localhost:5173/login";
-                </script>
-            '''
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User not found", "success": False}), 404
 
-        try:
-            user.password = generate_password_hash(new_password)
-            db.session.commit()
-            return '''
-                <script>
-                    alert("Password reset successful! Redirecting to login...");
-                    window.location.href = "http://localhost:5173/login";
-                </script>
-            '''
-        except Exception as e:
-            db.session.rollback()
-            return '''
-                <script>
-                    alert("Failed to reset password. Please try again.");
-                    window.history.back();
-                </script>
-            '''
+    try:
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+        return jsonify({"message": "Password reset successful! Redirecting to login...", "success": True}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Failed to reset password. Please try again.", "success": False}), 500
+
+
 
 
 
