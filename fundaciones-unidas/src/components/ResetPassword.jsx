@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -9,19 +10,34 @@ const ResetPassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(`http://localhost:5000/reset-password/${token}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password }),
-        });
+        try {
+            const response = await fetch(`http://localhost:5000/auth/reset-password/${token}`, {  // <-- Corrected URL
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password }),
+            });
 
-        const result = await response.json();
-        setMessage(result.message);
+            if (!response.ok) {
+                throw new Error("Failed to reset password");
+            }
 
-        if (result.success) {
-            setTimeout(() => navigate("/login"), 2000);
+            const result = await response.json();
+            //setMessage(result.message);
+
+            if (result.success) {
+                Swal.fire({
+                    title: "Password reset successfully!",
+                    icon: "success",
+                    draggable: true
+                });
+                setTimeout(() => navigate("/login"), 2000);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setMessage("An error occurred. Please try again.");
         }
     };
+
 
     return (
         <div className="flex flex-col items-center justify-center h-screen">
