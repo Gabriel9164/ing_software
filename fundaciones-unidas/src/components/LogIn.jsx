@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { loginUser } from "../services/api";
 import Swal from "sweetalert2";
 
-const LogIn = ({ isAdmin = false }) => {
+const LogIn = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
@@ -34,7 +34,7 @@ const LogIn = ({ isAdmin = false }) => {
     };
 
     return (
-        <div className={`login-container ${isAdmin ? "admin-view" : ""}`}>
+        <div className="login-container">
             <div className="login-content">
                 <div className="logo-container">
                     <img src="/vite.svg" alt="Logo" />
@@ -62,13 +62,11 @@ const LogIn = ({ isAdmin = false }) => {
 
                 {/* Navigate to signup page */}
                 <p>¿No tienes una cuenta? <button onClick={() => navigate("/signup")}>Regístrate aquí</button></p>
+                <p>¿Olvidaste tu contraseña? <button onClick={() => navigate("/forgot-password")}>Clic aqui</button></p>
+
             </div>
             <div className="login-side">
-                <h3>
-                    {isAdmin
-                        ? "Coordina, actúa y transforma. ¡Juntos por un mundo más verde!"
-                        : "Manos unidas, comunidades transformadas."}
-                </h3>
+                <h3>Manos unidas, comunidades transformadas.</h3>
             </div>
         </div>
     );
