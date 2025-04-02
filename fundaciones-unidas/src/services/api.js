@@ -52,3 +52,11 @@ export const recoverPassword = async (email) => {
 };
 
 
+export const resetPassword = async (token, password) => {
+    try {
+        const response = await api.post(`/auth/reset-password/${token}`, { password });
+        return response.data;
+    } catch (error) {
+        return { error: error.response?.data?.message || "Error al restablecer la contraseña" };
+    }
+};
