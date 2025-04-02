@@ -2,6 +2,7 @@ from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from flaskr.models import RolesEnum
+from flaskr.models.RolesEnum import statusEnum
 from flaskr.utils.db import db
 from flaskr.models.user import User
 
@@ -15,16 +16,21 @@ class AuthService:
             return {"error": "Email already registered"}, 400
 
         hashed_password = generate_password_hash(password)
-        if isinstance(rol, str):
-            try:
-                rol = RolesEnum[rol]  # Convierte el string a Enum
-            except KeyError:
-                return {"error": "Invalid role"}, 400
+        try:
+            if isinstance(rol, str):
+                rol = RolesEnum(rol.lower())  # Convertir a minúsculas y luego a Enum
+            elif isinstance(rol, RolesEnum):
+                rol = rol
+            else:
+                return {"error": "Invalid role format"}, 400
+        except ValueError:
+            return {"error": "Invalid role"}, 400
         new_user = User(
             email=email,
             nombre_completo=nombre_completo,
             password=hashed_password,
-            rol=rol
+            rol=RolesEnum.VOLUNTARIO,
+            estatus=statusEnum.ACTIVE
         )
 
         try:

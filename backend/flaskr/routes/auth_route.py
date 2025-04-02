@@ -12,14 +12,14 @@ auth_service = AuthService()
 def signup():
     data = request.get_json()
 
-    required_fields = ['nombre_completo','email', 'password', 'rol']
+    required_fields = ['nombre_completo','email', 'password']
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
 
     nombre_completo = data['nombre_completo']
     email = data['email']
     password = data['password']
-    rol = data['rol']
+    rol = "voluntario"
 
     if '@' not in email:
         return jsonify({"error": "Invalid email format"}), 400
