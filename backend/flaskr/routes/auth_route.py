@@ -34,7 +34,7 @@ def signup():
     return jsonify(result), status
 
 @auth_bp.route('/login', methods=['POST'])
-@cross_origin(origins="http://localhost:5173", supports_credentials=True)
+@cross_origin(origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.1.64:5176"], supports_credentials=True)
 def login():
     data = request.get_json()
 
@@ -50,7 +50,7 @@ def login():
 
 
 @auth_bp.route('/recover-password', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "http://127.0.0.1:5173"], supports_credentials=True)
+@cross_origin(origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.1.64:5176"], supports_credentials=True)
 def recover_password():
     if request.method == 'OPTIONS':
         return '', 200
