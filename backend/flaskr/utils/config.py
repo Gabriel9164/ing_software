@@ -17,3 +17,4 @@ class Config:
     MAIL_USERNAME = os.getenv("MAIL_USERNAME", "fundacionesunidas277@gmail.com")
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "pzxr vcru ucjf iwou")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "fundacionesunidas277@gmail.com")
+    ROUTE = os.getenv("ROUTE")

@@ -13,6 +13,7 @@ auth_bp = Blueprint('auth_bp', __name__)
 auth_service = AuthService()
 
 @auth_bp.route('/signup', methods=['POST'])
+@cross_origin(origins=Config.ROUTE, supports_credentials=True)
 def signup():
     data = request.get_json()
 
@@ -34,7 +35,7 @@ def signup():
     return jsonify(result), status
 
 @auth_bp.route('/login', methods=['POST'])
-@cross_origin(origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.1.64:5176"], supports_credentials=True)
+@cross_origin(origins=Config.ROUTE, supports_credentials=True)
 def login():
     data = request.get_json()
 
@@ -50,17 +51,12 @@ def login():
 
 
 @auth_bp.route('/recover-password', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.1.64:5176"], supports_credentials=True)
+@cross_origin(origins=Config.ROUTE, supports_credentials=True)
 def recover_password():
-    if request.method == 'OPTIONS':
-        return '', 200
-
     data = request.get_json()
     email = data.get('email')
 
     current_app.logger.info(f"Password reset requested for: {email}")
-
-    # Rest of your function remains the same...
 
     if not email:
         return jsonify({"error": "Email is required"}), 400
@@ -100,11 +96,11 @@ def recover_password():
 from flask import jsonify, redirect
 
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
-@cross_origin(origins="http://localhost:5173", supports_credentials=True)
+@cross_origin(origins=Config.ROUTE, supports_credentials=True)
 def reset_password(token):
     if request.method == 'GET':
         # Redirect user to the React frontend for password reset
-        return redirect(f"http://localhost:5173/reset-password/{token}")
+        return redirect(f"{Config.ROUTE}/reset-password/{token}")
 
     # Handle POST request for actual password reset
     data = request.get_json()
