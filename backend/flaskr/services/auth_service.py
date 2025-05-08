@@ -52,4 +52,4 @@ class AuthService:
 
         access_token = create_access_token(identity={"email": user.email, "rol": user.rol.value})
 
-        return {"access_token": access_token, "rol":user.rol.value}, 200
+        return {"access_token": access_token, "rol":user.rol.value, "email":user.email}, 200
