@@ -4,6 +4,7 @@ import SignUp from "./components/SignUp.jsx";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import ForgotPassword from "./components/forgotPassword.jsx";
 import ResetPassword from "./components/ResetPassword.jsx";
+import Eventos from "./components/Eventos.jsx";
 
 function App() {
     return (
@@ -15,7 +16,7 @@ function App() {
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/forgot-password" element={<ForgotPassword />}/>
                     <Route path="/reset-password/:token" element={<ResetPassword />} />
-
+                    <Route path="/eventos" element={<Eventos />} />
                 </Routes>
             </div>
         </Router>

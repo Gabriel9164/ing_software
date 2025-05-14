@@ -39,7 +39,7 @@ class AuthService:
 
             access_token = create_access_token(identity={"email": email, "rol": rol.value})
 
-            return {"access_token": access_token}, 201
+            return {"access_201token": access_token},
         except Exception as e:
             db.session.rollback()
             return {"error": str(e)}, 500
@@ -52,4 +52,4 @@ class AuthService:
 
         access_token = create_access_token(identity={"email": user.email, "rol": user.rol.value})
 
-        return {"access_token": access_token, "rol":user.rol.value}, 200
+        return {"access_token": access_token, "rol":user.rol.value, "email":user.email}, 200
